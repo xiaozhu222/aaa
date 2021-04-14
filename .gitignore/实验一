@@ -1,0 +1,51 @@
+#include <MPython.h>
+#include <DFRobot_Iot.h>
+// 函数声明
+void obloqMqttEventT0(String& message);
+void obloqMqttEventT1(String& message);
+// 静态常量
+const String topics[5] = {"1uFvXylMR","eCBujs_GR","","",""};
+const MsgHandleCb msgHandles[5] = {obloqMqttEventT0,obloqMqttEventT1,NULL,NULL,NULL};
+// 创建对象
+DFRobot_Iot myIot;
+
+
+// 主程序开始
+void setup() {
+	mPython.begin();
+	myIot.setMqttCallback(msgHandles);
+	myIot.wifiConnect("Honor 10", "157183ab");
+	while (!myIot.wifiStatus()) {yield();}
+	display.setCursorLine(1);
+	display.printLine("Mind+");
+	myIot.init("iot.dfrobot.com.cn","xEQd_s_Gg","","bPwO_slMRz",topics,1883);
+	myIot.connect();
+	while (!myIot.connected()) {yield();}
+	display.setCursorLine(2);
+	display.printLine("Mind+");
+}
+void loop() {
+	if ((buttonA.isPressed())) {
+		myIot.publish(topic_0, "hello");
+		display.setCursorLine(3);
+		display.printLine("A已按下");
+	}
+	if ((buttonB.isPressed())) {
+		myIot.publish(topic_1, "good");
+		display.setCursorLine(3);
+		display.printLine("B已按下");
+	}
+}
+
+
+// 事件回调函数
+void obloqMqttEventT0(String& message) {
+	display.setCursorLine(4);
+	display.printLine("红灯");
+	rgb.write(-1, 0xFF0000);
+}
+void obloqMqttEventT1(String& message) {
+	display.setCursorLine(4);
+	display.printLine("蓝灯");
+	rgb.write(-1, 0x0000FF);
+}
